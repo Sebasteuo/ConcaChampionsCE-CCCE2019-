@@ -1,0 +1,13 @@
+#lang racket
+
+
+
+(require (lib "graphics.ss" "graphics"))
+(open-graphics)
+ 
+(define ventana1 (open-viewport "ConcaChampionsCE (CCCE2019)" 660 438))
+
+
+
+(((draw-pixmap-posn "images/cancha.gif" 'gif/mask) ventana1)(make-posn 200 200 ))
+(((draw-pixmap-posn "images/cancha.gif" 'gif/mask) ventana1)(make-posn 410 400 ))
