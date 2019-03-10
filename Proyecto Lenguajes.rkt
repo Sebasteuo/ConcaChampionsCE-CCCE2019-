@@ -48,6 +48,19 @@
       (else (listaMayores pivote (cdr listaDesordenada) listaOrdenada))
       )
   )
+
+;;**********************************************************************************************************************
+
+;;----------------------------------------------------------------------------------------------------------------------
+;;Conjunto de funciones para la primera generación
+;;----------------------------------------------------------------------------------------------------------------------
+;;Generador de gen con numeros aleatorios
+(define (Random-gen Gen Habilidades)
+  (cond ((zero? Habilidades)
+         Gen)
+        (else
+  (Random-gen (cons (random 10) Gen) (- Habilidades 1)))))
+
 ;;**********************************************************************************************************************
 
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -104,7 +117,7 @@
       )
   )
 (define (cruceAux listaDeLosMejores listaNuevosHijos)
-(cond ((empty? listaDeLosmejores) listaNuevosHijos)
+(cond ((empty? listaDeLosMejores) listaNuevosHijos)
       ((even? (contadorDeElementos listaDeLosMejores)) (cruceAux (cdr(cdr listaDeLosMejores)) (append listaNuevosHijos (intercambio (car listaDeLosMejores) (car(cdr listaDeLosMejores))))))
       (else (cruceAux '() listaNuevosHijos))
       )
@@ -156,5 +169,7 @@
 (define (fitnessAtaque jugador1  )
 (+ (cdr (car jugador1)) + 1)
 )
+
+
 
 
