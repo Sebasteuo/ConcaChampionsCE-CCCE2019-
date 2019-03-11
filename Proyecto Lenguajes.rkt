@@ -280,6 +280,25 @@
 (+ (cdr (car jugador1)) + 1)
 )
 
+;;Fitness General para el equipo, Bola es la última posición de la bola
+(define (Fitness_por_equipo Equipo Bola)
+  (Fitness_por_equipo_aux Equipo Bola 4))
+
+(define (Fitness_por_equipo_aux Equipo Bola Iterador)
+  (cond ((zero? Iterador)
+         '())
+        ((equal? Iterador 4)
+         );; Llamada fitness de porteros
+        ((equal? Iterador 3)
+         (cons (Fit_Defensa (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
+        ((equal? Iterador 2)
+         (cons (Fit_Medios (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
+        ((equal? Iterador 1)
+         ) ;; Llama fitness de delanteros
+        ))
+         
+        
+
 ;; Fitness para todos los defensas, retorna lista con notas de los defensas
 (define (Fit_Defensa Defensas Bola)
   (cond ((null? Defensas)
@@ -309,6 +328,3 @@
 (define (calcularNotaporDelante Defensa Bola)
   (* (+ (/ (abs (- (caar Defensa) (car Bola))) 274)
         (/ (abs (- (cadar Defensa) (cadr Bola))) 515)) 5))
-
-  
-
