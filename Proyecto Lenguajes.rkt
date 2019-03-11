@@ -66,7 +66,7 @@
 ;;Fitness para defensas
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;**********************************************************************************************************************
-;; Fitness para defensa
+;; Fitness para defensa recibe Bola = (posx posy)
 (define (Fit_Defensa_individual Defensa Bola)
   (cond ((and (>= (car Bola) 0) (<= (car Bola) 274)) ;; Evalua que la bola está en el area de defensa izquierda
          (cond ((> (- (caar Defensa) (car Bola)) 0) ;; Bola detrás de la defensa
