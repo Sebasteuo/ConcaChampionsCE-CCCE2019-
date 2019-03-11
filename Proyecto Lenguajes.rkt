@@ -147,7 +147,35 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Conjunto de funciones que selecciona los individuos más fuertes de cada generacion, con un promedio de sus genes.
 ;;----------------------------------------------------------------------------------------------------------------------
+;;ESTAS SON LAS QUE FUNCIONAN(NUEVAS)
 
+;;Seleccion de jugadores, recibe (listaFtness listaJugadores), retorna (listaMejores)
+;;Entrada:(seleccionNatural '( (3 5 6 ) ((1 2 3)(4 5 6) (7 8 9))))-> Retorna: (list (list 4 5 6) (list 7 8 9)) que son las posiciones que tienen mejor fitness
+;;                                x x ->mejores fitness
+
+(define (seleccionNatural listaGeneral)
+(seleccionMejores (seleccionPorFitness (car listaGeneral) '() 0) (car (cdr listaGeneral)) '() 0 )
+ )
+
+;;Entra lista de fitness de alguna posicion (defensas,o medios,o delanteros), retorna una lista con la posicion de los mejores:
+;;Ej entra (list 10 3 6 2 5 6 7 )-> retorna (list 0 2 4 5 6)(<- son las posiciones de los jugadores con mas fitness de la lista de Fitness por posicion)
+
+(define (seleccionPorFitness listaFitness listaMejoresFitness contador)
+  (cond ((empty? listaFitness) listaMejoresFitness)
+        ((>= (car listaFitness) 5) (seleccionPorFitness (cdr listaFitness) (append listaMejoresFitness (list contador)) (+ contador 1)))
+        (else (seleccionPorFitness (cdr listaFitness) listaMejoresFitness (+ contador 1)))
+        )
+  )
+
+
+(define (seleccionMejores listaMejoresFitness listaJugadores jugadoresMejores contador)
+(cond((or (empty? listaJugadores) (empty? listaMejoresFitness)) jugadoresMejores)
+     ((equal? (car listaMejoresFitness) contador) (seleccionMejores (cdr listaMejoresFitness) (cdr listaJugadores) (append jugadoresMejores (list(car listaJugadores))) (+ contador 1)))
+     (else (seleccionMejores listaMejoresFitness (cdr listaJugadores) jugadoresMejores (+ contador 1)))
+
+     )
+  )
+;;----------------------------------------------------------------------------------------------------------------------
 
 ;;Funcion principal de seleccion de los mejores jugadores.
 (define (sleccionPromedioMayor listaJugadores )
