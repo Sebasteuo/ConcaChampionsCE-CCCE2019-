@@ -54,6 +54,88 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Conjunto de funciones para la primera generación
 ;;----------------------------------------------------------------------------------------------------------------------
+(define (generaEquipos listaFormaciones listaJugadores contador)
+(cond ((empty? listaFormaciones) listaJugadores)
+
+      ((equal? contador 1) (generaEquipos (cdr listaFormaciones) (append listaJugadores (list (genera1Aux (car listaFormaciones) '() 1))) (+ contador 1)))
+      ((equal? contador 2) (generaEquipos (cdr listaFormaciones) (append listaJugadores (list (genera2Aux (car listaFormaciones) '() 1))) (+ contador 2)))
+      (else (generaEquipos (cdr listaFormaciones) (append listaJugadores listaFormaciones) contador))
+      )
+  )
+   
+      
+
+
+(define (genera1Aux listaFormacion listaJugadores contador)
+  (cond ((empty? listaFormacion) (append (generadorPortero '())listaJugadores))
+        ((equal? contador 1) (genera1Aux (cdr listaFormacion) (append listaJugadores (generaDefensas1 (car listaFormacion) '())) (+ contador 1)))
+        ((equal? contador 2) (genera1Aux (cdr listaFormacion) (append listaJugadores (generaMedios1 (car listaFormacion) '())) (+ contador 1)))
+        ((equal? contador 3) (genera1Aux (cdr listaFormacion) (append listaJugadores (generaDelanteros1 (car listaFormacion) '())) contador))
+        )
+  )
+(define (genera2Aux listaFormacion listaJugadores contador)
+  (cond ((empty? listaFormacion) (append (generadorPortero2 '())listaJugadores))
+        ((equal? contador 1) (genera2Aux (cdr listaFormacion) (append listaJugadores (generaDefensas2 (car listaFormacion) '())) (+ contador 1)))
+        ((equal? contador 2) (genera2Aux (cdr listaFormacion) (append listaJugadores (generaMedios2 (car listaFormacion) '())) (+ contador 1)))
+        ((equal? contador 3) (genera2Aux (cdr listaFormacion) (append listaJugadores (generaDelanteros2 (car listaFormacion) '() )) contador))
+        )
+  )
+  
+;;generador de portero grupo1
+(define (generadorPortero caracteristicas)
+(append caracteristicas (list (list (random 0 40) (random 180 345))) (list (random 0 10)) (list (random 0 10)) (list 1) (list 0) (list(list 0 0)))
+      )
+
+
+;;generador de defensas grupo1
+(define (generaDefensas1 cantidadDefensas listaDefensas)
+  (cond ((zero? cantidadDefensas) listaDefensas)
+        (else (generaDefensas1 (- cantidadDefensas 1) (append listaDefensas (list (list (list (random 0 274) (random 5 520)))) (list (random 0 10)) (list (random 0 10)) (list (random 1 60)) (list 0) (list(list 0 0)) )
+
+
+        )
+
+  )))
+       
+;;generador de medios grupo1
+
+(define (generaMedios1 cantidadMedios listaMedios)
+  (cond ((zero? cantidadMedios) listaMedios)
+        (else (generaMedios1 (- cantidadMedios 1) (append listaMedios (list (list (list (random 274 510) (random 5 520)))) (list (random 0 10)) (list (random 0 10)) (list (random 1 60)) (list 0) (list(list 0 0)) )
+        )
+  )))
+;;generador de delanteros grupo1
+(define (generaDelanteros1 cantidadDelanteros listaDelanteros)
+  (cond ((zero? cantidadDelanteros) listaDelanteros)
+        (else (generaDelanteros1 (- cantidadDelanteros 1) (append listaDelanteros (list (list (list (random 510 785) (random 5 520)))) (list (random 0 10)) (list (random 0 10)) (list (random 1 60)) (list 0) (list(list 0 0)) )
+        )
+  )))
+;;generador de portero grupo2
+(define (generadorPortero2 caracteristicas)
+(append caracteristicas (list (list (random 745 785) (random 180 345)) ) (list (random 0 10)) (list (random 0 10)) (list 1) (list 0) (list(list 0 0)))
+      )
+
+
+;;generador de defensas grupo2
+(define (generaDefensas2 cantidadDefensas listaDefensas)
+  (cond ((zero? cantidadDefensas) listaDefensas)
+        (else (generaDefensas2 (- cantidadDefensas 1) (append listaDefensas (list (list (list (random 510 785) (random 5 520)))) (list (random 0 10)) (list (random 0 10)) (list (random 1 60)) (list 0) (list(list 0 0)) )
+        )
+  )))
+;;generador de medios grupo2
+(define (generaMedios2 cantidadMedios listaMedios)
+  (cond ((zero? cantidadMedios) listaMedios)
+        (else (generaMedios2 (- cantidadMedios 1) (append listaMedios (list (list (list (random 274 510) (random 5 520)))) (list (random 0 10)) (list (random 0 10)) (list (random 1 60)) (list 0) (list(list 0 0)) )
+        )
+  )))
+;;generador de delanteros grupo2
+(define (generaDelanteros2 cantidadDelanteros listaDelanteros)
+  (cond ((zero? cantidadDelanteros) listaDelanteros)
+        (else (generaDelanteros2 (- cantidadDelanteros 1) (append listaDelanteros (list (list (list (random 510 785) (random 5 520)))) (list (random 0 10)) (list (random 0 10)) (list (random 1 60)) (list 0) (list(list 0 0)) )
+        )
+  )))
+
+;; Aqui se llama a la funcion(generaEquipos '((4 4 2) (3 3 4) 10) '() 1)
 ;;Generador de gen con numeros aleatorios
 (define (Random-gen Gen Habilidades)
   (cond ((zero? Habilidades)
