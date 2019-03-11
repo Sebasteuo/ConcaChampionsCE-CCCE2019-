@@ -66,14 +66,28 @@
 ;;Fitness para defensas
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;**********************************************************************************************************************
-
+;; Fitness para defensa
 (define (Fit_Defensa_individual Defensa Bola)
   (cond ((and (>= (car Bola) 0) (<= (car Bola) 274)) ;; Evalua que la bola está en el area de defensa izquierda
-         (cond ((> (- (caar Defensa) (car Bola)) 0)
-                (+ (* (cadr Defensa) 0.8) (* (caddr Defensa) 0.2)))))))
-        ;;((and (>= (car Bola) 510) (<= (car Bola) 785)) ;; Evalua que la bola está en el area de defensa derecha
-         
+         (cond ((> (- (caar Defensa) (car Bola)) 0) ;; Bola detrás de la defensa
+                (+ (* (cadr Defensa) 0.5) (* (caddr Defensa) 0.2))) ;; Por estar detras de los defensas entonces la nota de 10 le baja a 70
+               (else (calcularNotaporDelante Defensa Bola))))
+        ((and (>= (car Bola) 510) (<= (car Bola) 785)) ;; Evalua que la bola está en el area de defensa derecha
+         (cond ((< (- (caar Defensa) (car Bola)) 0) ;; Bola detrás de la defensa
+                (+ (* (cadr Defensa) 0.5) (* (caddr Defensa) 0.2))) ;; Por estar detras de los defensas entonces la nota de 10 le baja a 70
+               (else (calcularNotaporDelante Defensa Bola))))
+        (else 
+               (cond ((<= (caar Defensa) 274) ;; Valida que es defensa de la izquierda
+                      (* (/ (abs (- (caar Defensa) 40)) 210) 10)) 
+                     (else (* (/ (abs (- (caar Defensa) 40 510)) 210) 10))))
+        )
+  )
 
+
+;; Obtiene la nota cuando la bola es
+(define (calcularNotaporDelante Defensa Bola)
+  (* (+ (/ (abs (- (caar Defensa) (car Bola))) 274)
+        (/ (abs (- (cadar Defensa) (cadr Bola))) 515)) 5))
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Conjunto de funciones que selecciona los individuos más fuertes de cada generacion, con un promedio de sus genes.
