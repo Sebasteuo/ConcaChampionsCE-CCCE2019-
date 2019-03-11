@@ -308,11 +308,15 @@
 (+ (cdr (car jugador1)) + 1)
 )
 
+;;Obtiene el número de jugador
+(define (ObtenerCamiseta Jugador)
+  (cadddr Jugador))
 ;;Fitness General para el equipo, Bola es la última posición de la bola
 (define (Fitness_por_equipo Equipo Bola)
-  (Fitness_por_equipo_aux Equipo Bola 4))
+  (Fitness_por_equipo_aux Equipo Bola 4 (ObtenerCamiseta (car Equipo))))
 
-(define (Fitness_por_equipo_aux Equipo Bola Iterador)
+
+(define (Fitness_por_equipo_aux Equipo Bola Iterador Equipo)
   (cond ((zero? Iterador)
          '())
         ((equal? Iterador 4)
@@ -320,7 +324,7 @@
         ((equal? Iterador 3)
          (cons (Fit_Defensa (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
         ((equal? Iterador 2)
-         (cons (Fit_Medios (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
+         (cons (Fit_Medios (car Equipo) Bola Equipo) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
         ((equal? Iterador 1)
          ) ;; Llama fitness de delanteros
         ))
@@ -352,7 +356,17 @@
   )
 
 
-;; Obtiene la nota cuando la bola es
+;; Obtiene la nota cuando la bola está por delante
 (define (calcularNotaporDelante Defensa Bola)
   (* (+ (/ (abs (- (caar Defensa) (car Bola))) 274)
         (/ (abs (- (cadar Defensa) (cadr Bola))) 515)) 5))
+
+;; Fitness para todos los medios
+(define (Fit_Medios Medios Bola Equipo)
+(cond ((null? Medios)
+         '())
+        (else (cons (round (Fit_Medios_individual (car Medios) Bola)) (Fit_Medios (cdr Medios) Bola)))))
+
+;;Fitness para cada medio
+(define (Fit_Medios_individual Medios Bola Equipo)
+  (cond ((
