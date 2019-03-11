@@ -67,12 +67,12 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;**********************************************************************************************************************
 
-(define (Fit_Defensa_individual Defensa Bola Notas) ;; Notas = (Nota pos, Nota fuerza, Nota velocidad)
+(define (Fit_Defensa_individual Defensa Bola)
   (cond ((and (>= (car Bola) 0) (<= (car Bola) 274)) ;; Evalua que la bola está en el area de defensa izquierda
          (cond ((> (- (caar Defensa) (car Bola)) 0)
-                
-        ((and (>= (car Bola) 510) (<= (car Bola) 785)) ;; Evalua que la bola está en el area de defensa derecha
-  
+                (+ (* (cadr Defensa) 0.8) (* (caddr Defensa) 0.2)))))))
+        ;;((and (>= (car Bola) 510) (<= (car Bola) 785)) ;; Evalua que la bola está en el area de defensa derecha
+         
 
 
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -163,10 +163,10 @@
   (cond((empty? jugador) jugadorNuevo)
        ((equal? contador 1) (fitnessPortero (cdr jugador) (append jugadorNuevo (mejorPosPortero (car jugador) '() 1 balon)) (+ contador 1) balon ))
        ((equal? contador 2) (fitnessPortero (cdr jugador) (append jugadorNuevo (list(mejorFuerza (car jugador) 0 balon))) (+ contador 1) balon))
-       ((equal? contador 3) (fitnessPorter0 (cdr jugador) )
+       ((equal? contador 3) (fitnessPortero (cdr jugador) )
        )
   
-  )
+  ))
 
 (define (mejorPosPortero pos nuevaPos contador balon)
 (cond ((empty? pos) nuevaPos)
