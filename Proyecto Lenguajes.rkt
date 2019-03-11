@@ -158,6 +158,35 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 ;; Evalua la posicion del jugador con respecto a la cancha, y si no está dentro del rango lo mejora, con fitnessCancha.
 
+
+(define (fitnessPortero jugador jugadorNuevo contador balon)
+  (cond((empty? jugador) jugadorNuevo)
+       ((equal? contador 1) (fitnessPortero (cdr jugador) (append jugadorNuevo (mejorPosPortero (car jugador) '() 1 balon)) (+ contador 1) balon ))
+       ((equal? contador 2) (fitnessPortero (cdr jugador) (append jugadorNuevo (list(mejorFuerza (car jugador) 0 balon))) (+ contador 1) balon))
+       ((equal? contador 3) (fitnessPorter0 (cdr jugador) )
+       )
+  
+  )
+
+(define (mejorPosPortero pos nuevaPos contador balon)
+(cond ((empty? pos) nuevaPos)
+      ;;Posicion en X
+      ((and (> 10 (- (car pos) (car balon))) (or (> 40 (car pos)) (> (car pos) 745) ) (equal? contador 1)) (mejorPosPortero (cdr pos) (append nuevaPos (list (car balon))) (+ contador 1) (cdr balon)))
+      ;;Posicion en Y
+      ((and (equal? contador 1) (> (car pos) 180) (> 345 (car pos))) (mejorPosPortero (cdr pos) (append nuevaPos (list (car balon))) contador balon ))
+
+      )
+  )
+(define (mejorFuerza fuerza nuevaFuerza balon)
+(cond ((> 10  (car balon) ) (+ nuevaFuerza (- 10 (car balon))))
+      (else nuevaFuerza)
+      )  
+  )
+
+  
+
+
+
 (define (evaluadorDefensa canchaX canchaY jugador resultado)
 (cond ((and (>= (car canchaY) (car (cdr jugador))) (>= (car (cdr jugador)) (car (cdr canchaY)))) 1)
       (else (fitnessCanchaY jugador))
@@ -181,6 +210,7 @@
 (define (fitnessAtaque jugador1  )
 (+ (cdr (car jugador1)) + 1)
 )
+
 
 
 
