@@ -316,17 +316,17 @@
   (Fitness_por_equipo_aux Equipo Bola 4 (ObtenerCamiseta (car Equipo))))
 
 
-(define (Fitness_por_equipo_aux Equipo Bola Iterador Equipo)
+(define (Fitness_por_equipo_aux Equipo Bola Iterador numEquipo)
   (cond ((zero? Iterador)
          '())
         ((equal? Iterador 4)
-         );; Llamada fitness de porteros
+         1);; Llamada fitness de porteros
         ((equal? Iterador 3)
          (cons (Fit_Defensa (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
         ((equal? Iterador 2)
-         (cons (Fit_Medios (car Equipo) Bola Equipo) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
+         (cons (Fit_Medios (car Equipo) Bola numEquipo) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
         ((equal? Iterador 1)
-         ) ;; Llama fitness de delanteros
+         1) ;; Llama fitness de delanteros
         ))
          
         
@@ -368,5 +368,4 @@
         (else (cons (round (Fit_Medios_individual (car Medios) Bola)) (Fit_Medios (cdr Medios) Bola)))))
 
 ;;Fitness para cada medio
-(define (Fit_Medios_individual Medios Bola Equipo)
-  (cond ((
+(define (Fit_Medios_individual Medios Bola Equipo) 1)
