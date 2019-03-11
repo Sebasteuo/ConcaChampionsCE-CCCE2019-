@@ -60,8 +60,20 @@
          Gen)
         (else
   (Random-gen (cons (random 10) Gen) (- Habilidades 1)))))
-
 ;;**********************************************************************************************************************
+
+;;----------------------------------------------------------------------------------------------------------------------
+;;Fitness para defensas
+;;----------------------------------------------------------------------------------------------------------------------
+;;**********************************************************************************************************************
+
+(define (Fit_Defensa_individual Defensa Bola Notas) ;; Notas = (Nota pos, Nota fuerza, Nota velocidad)
+  (cond ((and (>= (car Bola) 0) (<= (car Bola) 274)) ;; Evalua que la bola está en el area de defensa izquierda
+         (cond ((> (- (caar Defensa) (car Bola)) 0)
+                
+        ((and (>= (car Bola) 510) (<= (car Bola) 785)) ;; Evalua que la bola está en el area de defensa derecha
+  
+
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Conjunto de funciones que selecciona los individuos más fuertes de cada generacion, con un promedio de sus genes.
