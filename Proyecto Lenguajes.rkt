@@ -170,7 +170,7 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Conjunto de funciones que saca fitness para cada individuo
 ;;----------------------------------------------------------------------------------------------------------------------
-;; Evalua la posicion del jugador con respecto a la cancha, y si no está dentro del rango lo mejora, con fitnessCancha.
+;; Evalua la posicion del jugador con respecto a la cancha.
 
 
 (define (fitnessPortero jugador jugadorNuevo contador balon)
