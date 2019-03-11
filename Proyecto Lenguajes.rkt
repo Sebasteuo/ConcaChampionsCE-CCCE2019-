@@ -280,7 +280,14 @@
 (+ (cdr (car jugador1)) + 1)
 )
 
-;; Fitness para defensa recibe Bola = (posx posy)
+;; Fitness para todos los defensas, retorna lista con notas de los defensas
+(define (Fit_Defensa Defensas Bola)
+  (cond ((null? Defensas)
+         '())
+        (else (cons (round (Fit_Defensa_individual (car Defensas) Bola)) (Fit_Defensa (cdr Defensas) Bola)))))
+
+
+;; Fitness para cada defensa
 (define (Fit_Defensa_individual Defensa Bola)
   (cond ((and (>= (car Bola) 0) (<= (car Bola) 274)) ;; Evalua que la bola está en el area de defensa izquierda
          (cond ((> (- (caar Defensa) (car Bola)) 0) ;; Bola detrás de la defensa
@@ -303,5 +310,5 @@
   (* (+ (/ (abs (- (caar Defensa) (car Bola))) 274)
         (/ (abs (- (cadar Defensa) (cadr Bola))) 515)) 5))
 
-
+  
 
