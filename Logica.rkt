@@ -494,6 +494,35 @@
    (sqrt (+ (expt (car Par1) 2) (expt (cadr Par1) 2)))
    ))
 
+;;----------------------------------------------------------------------------------------------------------------------
+;;Mutacion de genes
+;;----------------------------------------------------------------------------------------------------------------------
+;;Función mutacion
+;;Entra lista de mejores y le cambia un gen aleatoriamente
+;;Cambiará fuerza o velocidad aleatoriamente.
+;;Entra listaMejores, sale una lista con algun jugador mutado
+
+(define (mutacion listaMejores )
+(mutacionAux listaMejores '() 1 (random 1 11) (random 2 3) )
+ )
+
+(define (mutacionAux listaMejores listaJugadoresMasMutado contador contador1Rand contador2Rand)
+
+(cond ((empty? listaMejores) listaJugadoresMasMutado)
+      ((equal? contador contador1Rand) (mutacionAux (cdr listaMejores) (append listaJugadoresMasMutado (list (mutadorJugador (car listaMejores) '() 1 contador2Rand))) (+ contador 1) contador1Rand contador2Rand))
+      (else (mutacionAux (cdr listaMejores) (append listaJugadoresMasMutado (list (car listaMejores))) (+ contador 1) contador1Rand contador2Rand))
+      )
+  )
+  
+ 
+(define (mutadorJugador jugador jugadorMutado contador contadorRand)
+(cond ((empty? jugador) jugadorMutado)
+      ((equal? contador contadorRand) ( mutadorJugador (cdr jugador) (append jugadorMutado (list (random 0 10))) (+ contador 1) contadorRand) )
+      (else (mutadorJugador (cdr jugador) (append jugadorMutado (list (car jugador))) (+ contador 1) contadorRand))
+      )
+  ) 
+;;----------------------------------------------------------------------------------------------------------------------
+
 ;; Variables de prueba
 (define Portero '(((20 262) 6 7 1 4 (274 250))))
 (define Defensas '(((120 160) 7 6 10 4 (274 250)) ((120 250) 2 4 22 4 (274 250)) ((120 320) 7 9 15 4 (274 250)) ((120 450) 8 6 3 4 (274 250))))
