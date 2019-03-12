@@ -520,7 +520,24 @@
       ((equal? contador contadorRand) ( mutadorJugador (cdr jugador) (append jugadorMutado (list (random 0 10))) (+ contador 1) contadorRand) )
       (else (mutadorJugador (cdr jugador) (append jugadorMutado (list (car jugador))) (+ contador 1) contadorRand))
       )
-  ) 
+  )
+
+(define (parejas padre1 padre2)
+  (list padre1 padre2 (Generar_Gen padre1 padre2)))
+
+(define (Generar_Gen Padre1 Padre2)
+  (list (list (Promedio (caar Padre1) (caar Padre2)) (Promedio (cadar Padre1) (cadar Padre2)))
+        (Promedio (cadr Padre1) (cadr Padre2))
+        (Promedio (caddr Padre1) (caddr Padre2))
+        (random 20 51)
+        0
+        (cadr(cddr(cddr Padre1)))))
+        
+  
+  
+
+(define (Promedio Num1 Num2)
+  (/ (+ Num1 Num2) 2))
 ;;----------------------------------------------------------------------------------------------------------------------
 
 ;; Variables de prueba
