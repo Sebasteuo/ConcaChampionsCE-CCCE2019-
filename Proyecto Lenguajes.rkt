@@ -112,7 +112,7 @@
   )))
 ;;generador de portero grupo2
 (define (generadorPortero2 caracteristicas)
-(append caracteristicas (list (list (random 745 785) (random 180 345)) ) (list (random 0 10)) (list (random 0 10)) (list 1) (list 0) (list(list 0 0)))
+(append caracteristicas (list (list (random 745 785) (random 180 345)) ) (list (random 0 10)) (list (random 0 10)) (list 2) (list 0) (list(list 0 0)))
       )
 
 
