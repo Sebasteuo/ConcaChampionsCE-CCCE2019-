@@ -320,13 +320,13 @@
   (cond ((zero? Iterador)
          '())
         ((equal? Iterador 4)
-         1);; Llamada fitness de porteros
+         (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo));; Llamada fitness de porteros
         ((equal? Iterador 3)
-         (cons (Fit_Defensa (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
+         (cons (Fit_Defensa (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
         ((equal? Iterador 2)
-         (cons (Fit_Medios (car Equipo) Bola numEquipo) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1))))
+         (cons (Fit_Medios (car Equipo) Bola numEquipo) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
         ((equal? Iterador 1)
-         1) ;; Llama fitness de delanteros
+         (cons (Fit_Delanteros (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo))) ;; Llama fitness de delanteros
         ))
          
         
@@ -335,16 +335,16 @@
 (define (Fit_Defensa Defensas Bola)
   (cond ((null? Defensas)
          '())
-        (else (cons (round (Fit_Defensa_individual (car Defensas) Bola)) (Fit_Defensa (cdr Defensas) Bola)))))
+        (else (cons (Fit_Defensa_individual (car Defensas) Bola) (Fit_Defensa (cdr Defensas) Bola)))))
 
 
 ;; Fitness para cada defensa
 (define (Fit_Defensa_individual Defensa Bola)
-  (cond ((and (>= (car Bola) 0) (<= (car Bola) 274)) ;; Evalua que la bola está en el area de defensa izquierda
+  (cond ((and (>= (car Bola) 0) (<= (car Bola) 274) (<= (caar Defensa) 274)) ;; Evalua que la bola está en el area de defensa izquierda
          (cond ((> (- (caar Defensa) (car Bola)) 0) ;; Bola detrás de la defensa
                 (+ (* (cadr Defensa) 0.5) (* (caddr Defensa) 0.2))) ;; Por estar detras de los defensas entonces la nota de 10 le baja a 70
                (else (calcularNotaporDelante Defensa Bola))))
-        ((and (>= (car Bola) 510) (<= (car Bola) 785)) ;; Evalua que la bola está en el area de defensa derecha
+        ((and (>= (car Bola) 510) (<= (car Bola) 785) (>= (caar Defensa) 510)) ;; Evalua que la bola está en el area de defensa derecha
          (cond ((< (- (caar Defensa) (car Bola)) 0) ;; Bola detrás de la defensa
                 (+ (* (cadr Defensa) 0.5) (* (caddr Defensa) 0.2))) ;; Por estar detras de los defensas entonces la nota de 10 le baja a 70
                (else (calcularNotaporDelante Defensa Bola))))
@@ -362,10 +362,82 @@
         (/ (abs (- (cadar Defensa) (cadr Bola))) 515)) 5))
 
 ;; Fitness para todos los medios
-(define (Fit_Medios Medios Bola Equipo)
+(define (Fit_Medios Medios Bola numEquipo)
 (cond ((null? Medios)
          '())
-        (else (cons (round (Fit_Medios_individual (car Medios) Bola)) (Fit_Medios (cdr Medios) Bola)))))
-
+        (else (cons (Fit_Medios_individual (car Medios) Bola numEquipo) (Fit_Medios (cdr Medios) Bola numEquipo)))))
+ 
 ;;Fitness para cada medio
-(define (Fit_Medios_individual Medios Bola Equipo) 1)
+(define (Fit_Medios_individual Medio Bola numEquipo)
+    (cond ((equal? numEquipo 1) ;;Equipo izquierdo
+      (Medios_Izquierdos Medio Bola))
+          (else (Medios_Derechos Medio Bola))))
+         
+        
+
+
+;;Evaluador de medios en la izquierda
+(define (Medios_Izquierdos Medio Bola)
+  (cond ((and (>= (car Bola) 274) (<= (car Bola) 510))
+         (cond ((> (- (caar Medio) (car Bola)) 0) ;; Pierde 30% de la nota
+                (+ (* (Nota_a_bola Medio Bola 566.5) 0.5) (* (Nota_a_linea Medio Bola 236 274) 0.2)))
+               (else
+                (+ (* (Nota_a_bola Medio Bola 566.5) 0.4) (* (Nota_a_linea Medio Bola 236 510) 0.4) (* (cadr Medio) 0.2))
+                )))
+        (else (Nota_a_linea Medio Bola 236 (car Bola)))))
+
+
+;; Evaluador de medios por la derecha
+(define (Medios_Derechos Medio Bola)
+  (cond ((and (>= (car Bola) 274) (<= (car Bola) 510))
+         (cond ((< (- (caar Medio) (car Bola)) 0) ;; Pierde 30% de la nota
+                (+ (* (Nota_a_bola Medio Bola 566.5) 0.5) (* (Nota_a_linea Medio Bola 236 510) 0.2)))
+               (else
+                (+ (* (Nota_a_bola Medio Bola 565.5) 0.4) (* (Nota_a_linea Medio Bola 236 274) 0.4) (* (cadr Medio) 0.2))
+                )))
+        (else (Nota_a_linea Medio Bola 236 (car Bola)))))
+
+
+
+(define (Fit_Delanteros Delanteros Bola)
+  (cond ((null? Delanteros)
+         '())
+        (else (cons (Fit_Delanteros_individual (car Delanteros) Bola) (Fit_Delanteros (cdr Delanteros) Bola)))))
+
+(define (Fit_Delanteros_individual Delantero Bola)
+  (cond ((and (>= (car Bola) 510) (<= (car Bola) 785) (>= (caar Delantero) 510)) ;;Delanteros del equipo de la izquierda
+         (cond ((> (- (caar Delantero) (car Bola)) 0)
+                (+ (* (Nota_a_bola Delantero Bola 583.8) 0.4) (* (+ (/ (- 4373 (* (Magnitud Bola '(785 262)) (cadr Delantero))) 4373)
+                                                                    (/ (- 583.8 (Magnitud Bola (car Delantero))) 583.8)) 5)))
+               (else (* (/ (- 4373 (* (Magnitud Bola '(785 262)) (cadr Delantero))) 4373) 10))))
+         ((and (>= (car Bola) 0) (<= (car Bola) 274) (<= (caar Delantero) 274)) ;; Delanteros del equipo de la derecha
+          (cond ((< (- (caar Delantero) (car Bola)) 0)
+                (+ (* (Nota_a_bola Delantero Bola 583.8) 0.4) (* (+ (/ (- 4373 (* (Magnitud Bola '(0 262)) (cadr Delantero))) 4373)
+                                                                    (/ (- 583.8 (Magnitud Bola (car Delantero))) 583.8)) 5)))
+                (else (* (/ (- 4373 (* (Magnitud Bola '(785 262)) (cadr Delantero))) 4373) 10))))
+         (else (cond ((>= (caar Delantero) 510)
+          (* (/ (- 437.3 (Magnitud (car Delantero) '(785 262))) 437.3) 10))
+                     (else (* (/ (- 437.3 (Magnitud (car Delantero) '(0 262))) 437.3) 10))))))
+         
+   
+;;Calcula la nota, según cuanto dura en llegar al balon
+(define (Nota_a_bola Jugador Bola Mayor_tiempo)
+  (* (/ (- Mayor_tiempo (/ (Magnitud (car Jugador) Bola) (caddr Jugador))) Mayor_tiempo) 10))
+
+;;Calcula la nota en llegar a la linea
+(define (Nota_a_linea Jugador Bola Mayor_tiempo Linea)
+  (* (/ (- Mayor_tiempo (/ (abs (- (caar Jugador) Linea)) (caddr Jugador))) Mayor_tiempo) 10))
+         
+;;Obtiene la diagonal entre dos pares ordenados
+(define (Magnitud Par1 Par2)
+  (inexact->exact
+   (sqrt (+ (expt (- (car Par1) (car Par2)) 2) (expt (- (cadr Par1) (cadr Par2)) 2)))
+   ))
+
+
+;; Variables de prueba
+(define Portero '((20 262) 6 7 1 4 (274 250)))
+(define Defensas '(((120 160) 7 6 10 4 (274 250)) ((120 250) 2 4 22 4 (274 250)) ((120 320) 7 9 15 4 (274 250)) ((120 450) 8 6 3 4 (274 250))))
+(define Medios '(((350 160) 4 2 2 4 (274 250)) ((350 250) 7 1 22 4 (274 250)) ((350 320) 2 1 13 4 (274 250)) ((350 450) 9 8 9 4 (274 250))))
+(define Delanteros '(((520 250) 10 10 10 4 (274 250)) ((520 450) 8 5 16 4 (274 250))))
+(define Equipo1 (list Portero Defensas Medios Delanteros))
