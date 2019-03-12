@@ -3,7 +3,7 @@
 (require graphics/graphics)
 (require 2htdp/image)
 (require racket/math)
-
+(require Proyecto Lenguajes.rkt)
 (open-graphics)
 
 
@@ -12,7 +12,10 @@
 ;;-----------------------------------------------------------------------------------------------------------------------------
 ;;INICIO DEL JUEGO
 
-(define (inicioDelJuego)
+(define (CCCE2019 Formación1 Formación2 Generaciones)
+  (cond ((zero? Generaciones)
+         (copy-viewport ventana2 ventana1))
+        (else 
   (begin
     (dibujarCancha)
     (mostrarDatos '(1 0) 12)
@@ -21,7 +24,8 @@
     (mostrarDatos '(1 1) 17)
     (copy-viewport ventana2 ventana1)
     ((clear-viewport ventana2))
-    ))
+    (CCCE2019 Formación1 Formación2 (- Generaciones 1))
+    ))))
 
 ;;VENTANAS
 (define ventana1 (open-viewport "*ConcaChampionsCE*" 800 700))
@@ -55,6 +59,7 @@
     ((flip-rectangle ventana2) (make-posn -100 210) 120 120 "white")   ;;Marco equipo izquierdo
     ((flip-rectangle ventana2) (make-posn 750 180) 180 180 "black")   ;;Area equipo derecho
     ((flip-rectangle ventana2) (make-posn 780 210) 120 120 "white")   ;;Marco equipo izquierdo
+    ((draw-solid-ellipse ventana2) (make-posn 400 262) 15 15 "blue")
     ))
 
 (define (dibujarVentana)
@@ -272,5 +277,5 @@
     ))
 
 
-(inicioDelJuego)
+(CCCE2019 '(4 4 2) '(4 4 2) 2)
 

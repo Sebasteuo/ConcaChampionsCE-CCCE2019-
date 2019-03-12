@@ -57,24 +57,37 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Funcion principal para obtener la primera generacion
 (define (Primera_Generacion Formacion1 Formacion2 Generaciones)
-  (generaEquipos (list Formacion1 Formacion2 Generaciones) '() 1)
-  )
+  (generaEquipos (list Formacion1 Formacion2 Generaciones) '() 1))
+
 ;; Funcion principal que realiza el proceso del algoritmo genético
+;; Equipos = (Equipo1 Equipo2),  Bola = (Bolax Bolay)
 (define (Genética Equipos Bola)
   (Genética_aux Equipos Equipos '() Bola))
+
 ;; Obtiene el fitness de los equipos y los envia a seleccion
 (define (Genética_aux Equipos Equipos_enviar Fitness Bola)
   (cond ((null? Equipos)
-         (Seleccion Equipos_enviar Fitness))
-        (else (Genética_aux (cdr Equipos) Equipos_enviar (append Fitness (Fitness_por_equipo (car Equipos) Bola)) Bola))))
+         (Seleccion Equipos_enviar Fitness '()))
+        (else (Genética_aux (cdr Equipos) Equipos_enviar (append Fitness (list (Fitness_por_equipo (car Equipos) Bola))) Bola))))
 
-;;Obtiene la seleccion
+;;Obtiene la seleccion de ambos equipos
 (define (Seleccion Equipos Fitness Mejores)
   (cond ((null? Fitness)
-         )
-        (else (Seleccion Equipos (cdr Fitness) (append Mejores (seleccionNatural (car Fitness)))))))
-                                                          
-         
+         Mejores
+         ) ;;Crossover
+        (else (Seleccion Equipos (cdr Fitness) (append Mejores (list (Seleccion_Equipo (car Equipos) (car Fitness) '())))))))
+
+;;Obtiene la seleccion de un equipo
+(define (Seleccion_Equipo Equipo Fitness_Equipo Mejores)
+  (cond ((null? Equipo)
+         Mejores)
+        (else (Seleccion_Equipo (cdr Equipo) (cdr Fitness_Equipo) (append Mejores (list (Seleccion_Individual (car Equipo) (car Fitness_Equipo)))))
+        )))
+
+;; Obtiene la seleccion de un tipo de jugador
+(define (Seleccion_Individual Jugadores Fitness_Jugadores)
+  (seleccionNatural (list Fitness_Jugadores Jugadores)))
+  
   
 ;;**********************************************************************************************************************
 
@@ -340,14 +353,14 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 
 (define (Fitness_por_equipo Equipo Bola)
-  (Fitness_por_equipo_aux Equipo Bola 4 (ObtenerCamiseta (car Equipo))))
+  (Fitness_por_equipo_aux Equipo Bola 4 (ObtenerCamiseta (caar Equipo))))
 
 
 (define (Fitness_por_equipo_aux Equipo Bola Iterador numEquipo)
   (cond ((zero? Iterador)
          '())
         ((equal? Iterador 4)
-         (cons (Fit_Portero (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
+         (cons (Fit_Portero (caar Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
         ((equal? Iterador 3)
          (cons (Fit_Defensa (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
         ((equal? Iterador 2)
@@ -482,7 +495,7 @@
    ))
 
 ;; Variables de prueba
-(define Portero '((20 262) 6 7 1 4 (274 250)))
+(define Portero '(((20 262) 6 7 1 4 (274 250))))
 (define Defensas '(((120 160) 7 6 10 4 (274 250)) ((120 250) 2 4 22 4 (274 250)) ((120 320) 7 9 15 4 (274 250)) ((120 450) 8 6 3 4 (274 250))))
 (define Medios '(((350 160) 4 2 2 4 (274 250)) ((350 250) 7 1 22 4 (274 250)) ((350 320) 2 1 13 4 (274 250)) ((350 450) 9 8 9 4 (274 250))))
 (define Delanteros '(((520 250) 10 10 10 4 (274 250)) ((520 450) 8 5 16 4 (274 250))))

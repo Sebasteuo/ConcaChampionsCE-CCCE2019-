@@ -49,6 +49,33 @@
       )
   )
 
+
+;;**********************************************************************************************************************
+
+;;----------------------------------------------------------------------------------------------------------------------
+;;FUNCIONES GENERALES PARA LA INTERFAZ
+;;----------------------------------------------------------------------------------------------------------------------
+;;Funcion principal para obtener la primera generacion
+(define (Primera_Generacion Formacion1 Formacion2 Generaciones)
+  (generaEquipos (list Formacion1 Formacion2 Generaciones) '() 1)
+  )
+;; Funcion principal que realiza el proceso del algoritmo genético
+(define (Genética Equipos Bola)
+  (Genética_aux Equipos Equipos '() Bola))
+;; Obtiene el fitness de los equipos y los envia a seleccion
+(define (Genética_aux Equipos Equipos_enviar Fitness Bola)
+  (cond ((null? Equipos)
+         (Seleccion Equipos_enviar Fitness))
+        (else (Genética_aux (cdr Equipos) Equipos_enviar (append Fitness (Fitness_por_equipo (car Equipos) Bola)) Bola))))
+
+;;Obtiene la seleccion
+(define (Seleccion Equipos Fitness Mejores)
+  (cond ((null? Fitness)
+         )
+        (else (Seleccion Equipos (cdr Fitness) (append Mejores (seleccionNatural (car Fitness)))))))
+                                                          
+         
+  
 ;;**********************************************************************************************************************
 
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -63,9 +90,6 @@
       )
   )
    
-      
-
-
 (define (genera1Aux listaFormacion listaJugadores contador)
   (cond ((empty? listaFormacion) (append (generadorPortero '())listaJugadores))
         ((equal? contador 1) (genera1Aux (cdr listaFormacion) (append listaJugadores (generaDefensas1 (car listaFormacion) '())) (+ contador 1)))
