@@ -521,6 +521,18 @@
       (else (mutadorJugador (cdr jugador) (append jugadorMutado (list (car jugador))) (+ contador 1) contadorRand))
       )
   )
+;;-------------------------------------------------------------------------------------------------------------------------------------------------------------
+(define (reproduccion mejoresJugadores cantidadJugadores)
+(reproduccionAux mejoresJugadores '() cantidadJugadores (- cantidadJugadores (contadorDeElementos mejoresJugadores)))
+ )
+
+
+(define (reproduccionAux mejoresJugadores listaDeNuevosJugadores cantidadJugadores hijosPorCrear)
+(cond((zero? hijosPorCrear) (append listaDeNuevosJugadores mejoresJugadores)
+     (else (reporduccionAux (cdr mejoresJugadores) (append  listaDeNuevosJugadores (parejas (car mejoresJugadores) (cdr(car mejoresJugadores)))) cantidadJugadores (- hijosPorCrear 1) ))
+
+     )
+ )
 
 (define (parejas padre1 padre2)
   (list padre1 padre2 (Generar_Gen padre1 padre2)))
