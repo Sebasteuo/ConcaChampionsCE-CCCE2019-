@@ -311,7 +311,10 @@
 ;;Obtiene el número de jugador
 (define (ObtenerCamiseta Jugador)
   (cadddr Jugador))
+;;----------------------------------------------------------------------------------------------------------------------
 ;;Fitness General para el equipo, Bola es la última posición de la bola
+;;----------------------------------------------------------------------------------------------------------------------
+
 (define (Fitness_por_equipo Equipo Bola)
   (Fitness_por_equipo_aux Equipo Bola 4 (ObtenerCamiseta (car Equipo))))
 
@@ -320,17 +323,27 @@
   (cond ((zero? Iterador)
          '())
         ((equal? Iterador 4)
-         (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo));; Llamada fitness de porteros
+         (cons (Fit_Portero (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
         ((equal? Iterador 3)
          (cons (Fit_Defensa (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
         ((equal? Iterador 2)
          (cons (Fit_Medios (car Equipo) Bola numEquipo) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
         ((equal? Iterador 1)
-         (cons (Fit_Delanteros (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo))) ;; Llama fitness de delanteros
+         (cons (Fit_Delanteros (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo))) 
         ))
          
-        
-
+;;----------------------------------------------------------------------------------------------------------------------
+;;Fitness para porteros
+;;----------------------------------------------------------------------------------------------------------------------       
+;; Fitness para todos los porteros
+(define (Fit_Portero Portero Bola)
+  (cond ((or (<= (car Bola) 274) (>= (car Bola) 510)) ;; Valida que es el izquierdo o izquierdo
+        (list (+ (* (Nota_a_bola Portero Bola 436.6) 0.7 ) (* (cadr Portero) 0.3))))
+        (else (list (* (/ (- 520 (abs (- (cadar Portero) (cadr Bola)))) 520) 10)))))
+                
+;;----------------------------------------------------------------------------------------------------------------------
+;;Fitness para defensas
+;;----------------------------------------------------------------------------------------------------------------------
 ;; Fitness para todos los defensas, retorna lista con notas de los defensas
 (define (Fit_Defensa Defensas Bola)
   (cond ((null? Defensas)
@@ -342,25 +355,27 @@
 (define (Fit_Defensa_individual Defensa Bola)
   (cond ((and (>= (car Bola) 0) (<= (car Bola) 274) (<= (caar Defensa) 274)) ;; Evalua que la bola está en el area de defensa izquierda
          (cond ((> (- (caar Defensa) (car Bola)) 0) ;; Bola detrás de la defensa
-                (+ (* (cadr Defensa) 0.5) (* (caddr Defensa) 0.2))) ;; Por estar detras de los defensas entonces la nota de 10 le baja a 70
+                (+ (* (cadr Defensa) 0.5) (* (caddr Defensa) 0.2))) ;; Por estar detras de los defensas entonces la nota de 10 le baja a 7
                (else (calcularNotaporDelante Defensa Bola))))
         ((and (>= (car Bola) 510) (<= (car Bola) 785) (>= (caar Defensa) 510)) ;; Evalua que la bola está en el area de defensa derecha
          (cond ((< (- (caar Defensa) (car Bola)) 0) ;; Bola detrás de la defensa
-                (+ (* (cadr Defensa) 0.5) (* (caddr Defensa) 0.2))) ;; Por estar detras de los defensas entonces la nota de 10 le baja a 70
+                (+ (* (cadr Defensa) 0.5) (* (caddr Defensa) 0.2))) ;; Por estar detras de los defensas entonces la nota de 10 le baja a 7
                (else (calcularNotaporDelante Defensa Bola))))
         (else 
                (cond ((<= (caar Defensa) 274) ;; Valida que es defensa de la izquierda
-                      (* (/ (abs (- (caar Defensa) 40)) 210) 10)) 
-                     (else (* (/ (abs (- (caar Defensa) 40 510)) 210) 10))))
+                      (Nota_a_linea Defensa Bola 236 40)) 
+                     (else (Nota_a_linea Defensa Bola 236 745))))
         )
   )
 
 
 ;; Obtiene la nota cuando la bola está por delante
 (define (calcularNotaporDelante Defensa Bola)
-  (* (+ (/ (abs (- (caar Defensa) (car Bola))) 274)
-        (/ (abs (- (cadar Defensa) (cadr Bola))) 515)) 5))
+  (* (/ (- 583.3 (Magnitud (car Defensa) Bola)) 583.3) 10))
 
+;;----------------------------------------------------------------------------------------------------------------------
+;;Fitness medios
+;;----------------------------------------------------------------------------------------------------------------------
 ;; Fitness para todos los medios
 (define (Fit_Medios Medios Bola numEquipo)
 (cond ((null? Medios)
@@ -398,7 +413,9 @@
         (else (Nota_a_linea Medio Bola 236 (car Bola)))))
 
 
-
+;;----------------------------------------------------------------------------------------------------------------------
+;;Fitness Delanteros
+;;----------------------------------------------------------------------------------------------------------------------
 (define (Fit_Delanteros Delanteros Bola)
   (cond ((null? Delanteros)
          '())
@@ -434,6 +451,11 @@
    (sqrt (+ (expt (- (car Par1) (car Par2)) 2) (expt (- (cadr Par1) (cadr Par2)) 2)))
    ))
 
+;; Obtiene la diagonal
+(define (Diagonal Par1)
+(inexact->exact
+   (sqrt (+ (expt (car Par1) 2) (expt (cadr Par1) 2)))
+   ))
 
 ;; Variables de prueba
 (define Portero '((20 262) 6 7 1 4 (274 250)))
