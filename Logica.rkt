@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-advanced-reader.ss" "lang")((modname Logica) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname Logica) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Conjunto de funciones genericas
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -65,29 +65,11 @@
   (Genética_aux Equipos Equipos '() Bola))
 
 ;; Obtiene el fitness de los equipos y los envia a seleccion
-(define (Genética_aux Equipos Equipos_enviar Fitness Bola)
-  (cond ((null? Equipos)
-         (Seleccion Equipos_enviar Fitness '()))
-        (else (Genética_aux (cdr Equipos) Equipos_enviar (append Fitness (list (Fitness_por_equipo (car Equipos) Bola))) Bola))))
-
-;;Obtiene la seleccion de ambos equipos
-(define (Seleccion Equipos Fitness Mejores)
-  (cond ((null? Fitness)
-         Mejores
-         ) ;;Crossover
-        (else (Seleccion Equipos (cdr Fitness) (append Mejores (list (Seleccion_Equipo (car Equipos) (car Fitness) '())))))))
-
-;;Obtiene la seleccion de un equipo
-(define (Seleccion_Equipo Equipo Fitness_Equipo Mejores)
-  (cond ((null? Equipo)
-         Mejores)
-        (else (Seleccion_Equipo (cdr Equipo) (cdr Fitness_Equipo) (append Mejores (list (Seleccion_Individual (car Equipo) (car Fitness_Equipo)))))
-        )))
-
-;; Obtiene la seleccion de un tipo de jugador
-(define (Seleccion_Individual Jugadores Fitness_Jugadores)
-  (seleccionNatural (list Fitness_Jugadores Jugadores)))
+(define (Genética_aux Equipos Fitness Bola)
+  )
   
+
+
   
 ;;**********************************************************************************************************************
 
@@ -528,15 +510,17 @@
 
 
 (define (reproduccionAux mejoresJugadores listaDeNuevosJugadores cantidadJugadores hijosPorCrear)
-(cond((zero? hijosPorCrear) (append listaDeNuevosJugadores mejoresJugadores)
-     (else (reporduccionAux (cdr mejoresJugadores) (append  listaDeNuevosJugadores (parejas (car mejoresJugadores) (cdr(car mejoresJugadores)))) cantidadJugadores (- hijosPorCrear 1) ))
+(cond((zero? hijosPorCrear) (append listaDeNuevosJugadores mejoresJugadores))
+     (else (reproduccionAux (cdr mejoresJugadores) (append  listaDeNuevosJugadores (parejas (car mejoresJugadores) (cdr(car mejoresJugadores)))) cantidadJugadores (- hijosPorCrear 1) ))
 
      )
  )
-  
-(define (parejas padre1 padre2)
-  (list padre1 padre2 (Generar_Gen padre1 padre2)))
 
+;; Realiza el cruce entre 2 padres
+(define (parejas padre1 padre2)
+  (list (Generar_Gen padre1 padre2)))
+
+;; Obtiene el gen del nuevo hijo
 (define (Generar_Gen Padre1 Padre2)
   (list (list (Promedio (caar Padre1) (caar Padre2)) (Promedio (cadar Padre1) (cadar Padre2)))
         (Promedio (cadr Padre1) (cadr Padre2))
@@ -545,23 +529,54 @@
         0
         (cadr(cddr(cddr Padre1)))))
         
-
+;; Funcion general para obtener un valor según posicion
 (define (Obtener_Posicion Lista Posición)
   (Obtener_aux Lista Posición 0)
   )
 
+;; Funcion auxiliar que obtiene el valor hasta llegar al iterador correcto
 (define (Obtener_aux Lista Posicion Iterador)
   (cond ((equal? Posicion Iterador)
          (car Lista))
         (else (Obtener_aux (cdr Lista) Posicion (+ Iterador 1)))))
+;;----------------------------------------------------------------------------------------------------------------------
+;;Fitness y reproduccion
+;;----------------------------------------------------------------------------------------------------------------------
+;;Función Reproduccion
+;;Entra lista de un Equipo 
+;;Tendrá un nuevo hijo cada tipo, y cada uno tendrá los nuevos fitness
 
-(define (Mayores_Fitness Jugadores Cantidad)
-  (Mayores_aux Jugadores Cantidad '()))
+
+;; Obtiene un equipo nuevo, donde ya se reproducen o se realiza el crossover, por lo que se realiza lo siguiente
+(define (Reproducir Equipo Bola)
+   (append (car (Insertar_en_fit Equipo (Fitness_por_equipo Equipo Bola) '())) ;; Quito el portero, debido a que este solo mutara, se añade su funcion de fitness
+                             (Reproducir_Equipo (cdr (Insertar_en_fit Equipo (Fitness_por_equipo Equipo Bola) '())) '()))) ;; Envio el resto del equipo a reproducirse según su tipo, con el nuevo fitness cada uno
+
+
+;; Obtiene una parte del equipo (sin portero), reproducida con el nuevo fitness anteriormente asignado
+(define (Reproducir_Equipo Jugadores_con_F Nueva)
+  (cond ((null? Jugadores_con_F)
+         Nueva)
+        (else (Reproducir_Equipo (cdr Jugadores_con_F) (append Nueva (list (Reproducir_2 (car Jugadores_con_F))))))))
+
+
+;; Reproducirá un tipo de jugador                              
+(define (Reproducir_2 Jugadores)
+  (append (Mayores_Fitness Jugadores) (parejas (car (Mayores_Fitness Jugadores)) (cadr (Mayores_Fitness Jugadores)))))
+
+;; Obtiene los mayores fitness de n-1 (FUNCION BASICA)
+(define (Mayores_Fitness Jugadores)
+  (cond ((equal?  (contadorDeElementos Jugadores) 2)
+         (Mayores_aux Jugadores 2 '()))
+        (else (Mayores_aux Jugadores (- (contadorDeElementos Jugadores) 1) '()))))
+
+;; Se usa para obtener la lista de mayores (FUNCION BASICA)
 (define (Mayores_aux Jugadores Cantidad Mayores)
   (cond ((zero? Cantidad)
          Mayores)
-        (else (Mayores_aux (cadr(Mayor_lista (cdr Jugadores) (car Jugadores) '()))  (- Cantidad 1) (append Mayores (car(Mayor_lista (cdr Jugadores) (car Jugadores) '())))))))
+        (else (Mayores_aux (cadr(Mayor_lista (cdr Jugadores) (car Jugadores) '()))  (- Cantidad 1) (append Mayores (list (car(Mayor_lista (cdr Jugadores) (car Jugadores) '()))))))))
 
+;; Obtiene la lista mayor según el valor de fitness (FUNCION BASICA)
 (define (Mayor_lista Jugadores Mayor Resto)
   (cond ((null? Jugadores)
          (list Mayor Resto))
@@ -569,11 +584,28 @@
          (Mayor_lista (cdr Jugadores) (car Jugadores) (cons Mayor Resto)))
         (else (Mayor_lista (cdr Jugadores) Mayor (cons (car Jugadores) Resto))
         )))
-        
-        
-  
-  
 
+;;Inserta el valor del nuevo fitness en el antiguo 
+(define (Insertar_en_fit Equipo Fitness Final) ;; Final vacia
+  (cond ((null? Equipo)
+         Final)
+        (else (Insertar_en_fit (cdr Equipo) (cdr Fitness) (append Final (list (Insertar_tipo (car Equipo) (car Fitness) '())) )))))
+         
+;;Inserta en un solo tipo de jugador el fitness    
+(define (Insertar_tipo Jugadores Fit_jugadores Parcial)
+  (cond ((null? Jugadores)
+         Parcial)
+        (else (Insertar_tipo (cdr Jugadores) (cdr Fit_jugadores) (append Parcial (list (Insertar_individual (car Jugadores) (car Fit_jugadores) '() 0)))))))
+        
+;;Inserta en un gen el fitness
+(define (Insertar_individual Gen Fitness Parcial Iterador)
+  (cond ((null? Gen)
+         Parcial)
+        ((equal? Iterador 4)
+         (Insertar_individual (cdr Gen) Fitness (append Parcial (list Fitness)) (+ Iterador 1)))
+        (else (Insertar_individual (cdr Gen) Fitness (append Parcial (list (car Gen))) (+ Iterador 1)))))
+
+;; Promedio entre 2 numeros
 (define (Promedio Num1 Num2)
   (/ (+ Num1 Num2) 2))
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -582,5 +614,5 @@
 (define Portero '(((20 262) 6 7 1 4 (274 250))))
 (define Defensas '(((120 160) 7 6 10 4 (274 250)) ((120 250) 2 4 22 4 (274 250)) ((120 320) 7 9 15 4 (274 250)) ((120 450) 8 6 3 4 (274 250))))
 (define Medios '(((350 160) 4 2 2 4 (274 250)) ((350 250) 7 1 22 4 (274 250)) ((350 320) 2 1 13 4 (274 250)) ((350 450) 9 8 9 4 (274 250))))
-(define Delanteros '(((520 250) 10 10 10 4 (274 250)) ((520 450) 8 5 16 4 (274 250))))
+(define Delanteros  '(((350 160) 4 2 2 4 (274 250)) ((350 250) 7 1 22 4 (274 250))))
 (define Equipo1 (list Portero Defensas Medios Delanteros))
