@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-advanced-reader.ss" "lang")((modname |Proyecto Lenguajes|) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname Logica) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Conjunto de funciones genericas
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -57,24 +57,37 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Funcion principal para obtener la primera generacion
 (define (Primera_Generacion Formacion1 Formacion2 Generaciones)
-  (generaEquipos (list Formacion1 Formacion2 Generaciones) '() 1)
-  )
+  (generaEquipos (list Formacion1 Formacion2 Generaciones) '() 1))
+
 ;; Funcion principal que realiza el proceso del algoritmo genético
+;; Equipos = (Equipo1 Equipo2),  Bola = (Bolax Bolay)
 (define (Genética Equipos Bola)
   (Genética_aux Equipos Equipos '() Bola))
+
 ;; Obtiene el fitness de los equipos y los envia a seleccion
 (define (Genética_aux Equipos Equipos_enviar Fitness Bola)
   (cond ((null? Equipos)
-         (Seleccion Equipos_enviar Fitness))
-        (else (Genética_aux (cdr Equipos) Equipos_enviar (append Fitness (Fitness_por_equipo (car Equipos) Bola)) Bola))))
+         (Seleccion Equipos_enviar Fitness '()))
+        (else (Genética_aux (cdr Equipos) Equipos_enviar (append Fitness (list (Fitness_por_equipo (car Equipos) Bola))) Bola))))
 
-;;Obtiene la seleccion
+;;Obtiene la seleccion de ambos equipos
 (define (Seleccion Equipos Fitness Mejores)
   (cond ((null? Fitness)
-         )
-        (else (Seleccion Equipos (cdr Fitness) (append Mejores (seleccionNatural (car Fitness)))))))
-                                                          
-         
+         Mejores
+         ) ;;Crossover
+        (else (Seleccion Equipos (cdr Fitness) (append Mejores (list (Seleccion_Equipo (car Equipos) (car Fitness) '())))))))
+
+;;Obtiene la seleccion de un equipo
+(define (Seleccion_Equipo Equipo Fitness_Equipo Mejores)
+  (cond ((null? Equipo)
+         Mejores)
+        (else (Seleccion_Equipo (cdr Equipo) (cdr Fitness_Equipo) (append Mejores (list (Seleccion_Individual (car Equipo) (car Fitness_Equipo)))))
+        )))
+
+;; Obtiene la seleccion de un tipo de jugador
+(define (Seleccion_Individual Jugadores Fitness_Jugadores)
+  (seleccionNatural (list Fitness_Jugadores Jugadores)))
+  
   
 ;;**********************************************************************************************************************
 
@@ -340,14 +353,14 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 
 (define (Fitness_por_equipo Equipo Bola)
-  (Fitness_por_equipo_aux Equipo Bola 4 (ObtenerCamiseta (car Equipo))))
+  (Fitness_por_equipo_aux Equipo Bola 4 (ObtenerCamiseta (caar Equipo))))
 
 
 (define (Fitness_por_equipo_aux Equipo Bola Iterador numEquipo)
   (cond ((zero? Iterador)
          '())
         ((equal? Iterador 4)
-         (cons (Fit_Portero (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
+         (cons (Fit_Portero (caar Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
         ((equal? Iterador 3)
          (cons (Fit_Defensa (car Equipo) Bola) (Fitness_por_equipo_aux (cdr Equipo) Bola (- Iterador 1) numEquipo)))
         ((equal? Iterador 2)
@@ -481,8 +494,92 @@
    (sqrt (+ (expt (car Par1) 2) (expt (cadr Par1) 2)))
    ))
 
+;;----------------------------------------------------------------------------------------------------------------------
+;;Mutacion de genes
+;;----------------------------------------------------------------------------------------------------------------------
+;;Función mutacion
+;;Entra lista de mejores y le cambia un gen aleatoriamente
+;;Cambiará fuerza o velocidad aleatoriamente.
+;;Entra listaMejores, sale una lista con algun jugador mutado
+
+(define (mutacion listaMejores )
+(mutacionAux listaMejores '() 1 (random 1 11) (random 2 3) )
+ )
+
+(define (mutacionAux listaMejores listaJugadoresMasMutado contador contador1Rand contador2Rand)
+
+(cond ((empty? listaMejores) listaJugadoresMasMutado)
+      ((equal? contador contador1Rand) (mutacionAux (cdr listaMejores) (append listaJugadoresMasMutado (list (mutadorJugador (car listaMejores) '() 1 contador2Rand))) (+ contador 1) contador1Rand contador2Rand))
+      (else (mutacionAux (cdr listaMejores) (append listaJugadoresMasMutado (list (car listaMejores))) (+ contador 1) contador1Rand contador2Rand))
+      )
+  )
+  
+ 
+(define (mutadorJugador jugador jugadorMutado contador contadorRand)
+(cond ((empty? jugador) jugadorMutado)
+      ((equal? contador contadorRand) ( mutadorJugador (cdr jugador) (append jugadorMutado (list (random 0 10))) (+ contador 1) contadorRand) )
+      (else (mutadorJugador (cdr jugador) (append jugadorMutado (list (car jugador))) (+ contador 1) contadorRand))
+      )
+  )
+;;-------------------------------------------------------------------------------------------------------------------------------------------------------------
+(define (reproduccion mejoresJugadores cantidadJugadores)
+(reproduccionAux mejoresJugadores '() cantidadJugadores (- cantidadJugadores (contadorDeElementos mejoresJugadores)))
+ )
+
+
+(define (reproduccionAux mejoresJugadores listaDeNuevosJugadores cantidadJugadores hijosPorCrear)
+(cond((zero? hijosPorCrear) (append listaDeNuevosJugadores mejoresJugadores)
+     (else (reporduccionAux (cdr mejoresJugadores) (append  listaDeNuevosJugadores (parejas (car mejoresJugadores) (cdr(car mejoresJugadores)))) cantidadJugadores (- hijosPorCrear 1) ))
+
+     )
+ )
+  
+(define (parejas padre1 padre2)
+  (list padre1 padre2 (Generar_Gen padre1 padre2)))
+
+(define (Generar_Gen Padre1 Padre2)
+  (list (list (Promedio (caar Padre1) (caar Padre2)) (Promedio (cadar Padre1) (cadar Padre2)))
+        (Promedio (cadr Padre1) (cadr Padre2))
+        (Promedio (caddr Padre1) (caddr Padre2))
+        (random 20 51)
+        0
+        (cadr(cddr(cddr Padre1)))))
+        
+
+(define (Obtener_Posicion Lista Posición)
+  (Obtener_aux Lista Posición 0)
+  )
+
+(define (Obtener_aux Lista Posicion Iterador)
+  (cond ((equal? Posicion Iterador)
+         (car Lista))
+        (else (Obtener_aux (cdr Lista) Posicion (+ Iterador 1)))))
+
+(define (Mayores_Fitness Jugadores Cantidad)
+  (Mayores_aux Jugadores Cantidad '()))
+(define (Mayores_aux Jugadores Cantidad Mayores)
+  (cond ((zero? Cantidad)
+         Mayores)
+        (else (Mayores_aux (cadr(Mayor_lista (cdr Jugadores) (car Jugadores) '()))  (- Cantidad 1) (append Mayores (car(Mayor_lista (cdr Jugadores) (car Jugadores) '())))))))
+
+(define (Mayor_lista Jugadores Mayor Resto)
+  (cond ((null? Jugadores)
+         (list Mayor Resto))
+        ((> (Obtener_Posicion (car Jugadores) 4) (Obtener_Posicion Mayor 4))
+         (Mayor_lista (cdr Jugadores) (car Jugadores) (cons Mayor Resto)))
+        (else (Mayor_lista (cdr Jugadores) Mayor (cons (car Jugadores) Resto))
+        )))
+        
+        
+  
+  
+
+(define (Promedio Num1 Num2)
+  (/ (+ Num1 Num2) 2))
+;;----------------------------------------------------------------------------------------------------------------------
+
 ;; Variables de prueba
-(define Portero '((20 262) 6 7 1 4 (274 250)))
+(define Portero '(((20 262) 6 7 1 4 (274 250))))
 (define Defensas '(((120 160) 7 6 10 4 (274 250)) ((120 250) 2 4 22 4 (274 250)) ((120 320) 7 9 15 4 (274 250)) ((120 450) 8 6 3 4 (274 250))))
 (define Medios '(((350 160) 4 2 2 4 (274 250)) ((350 250) 7 1 22 4 (274 250)) ((350 320) 2 1 13 4 (274 250)) ((350 450) 9 8 9 4 (274 250))))
 (define Delanteros '(((520 250) 10 10 10 4 (274 250)) ((520 450) 8 5 16 4 (274 250))))

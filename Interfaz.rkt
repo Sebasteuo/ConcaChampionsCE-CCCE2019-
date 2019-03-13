@@ -1,9 +1,8 @@
-
 #lang racket
 (require graphics/graphics)
 (require 2htdp/image)
 (require racket/math)
-(require Proyecto Lenguajes.rkt)
+
 (open-graphics)
 
 
@@ -12,25 +11,23 @@
 ;;-----------------------------------------------------------------------------------------------------------------------------
 ;;INICIO DEL JUEGO
 
-(define (CCCE2019 Formación1 Formación2 Generaciones)
-  (cond ((zero? Generaciones)
-         (copy-viewport ventana2 ventana1))
-        (else 
+(define (CCCE2019 Formación1 Formación2 Generaciones)    
   (begin
     (dibujarCancha)
     (mostrarDatos '(1 0) 12)
-    
-    (movimientoDeJugadores jugadores 0 '() (DiagonaldelJugador (car jugadores)) (AnguloJugador (car jugadores)) balon)
+    (movimientoDeJugadores equipos 0 '() (DiagonaldelJugador (car equipos)) (AnguloJugador (car equipos)) balon)
     (mostrarDatos '(1 1) 17)
     (copy-viewport ventana2 ventana1)
     ((clear-viewport ventana2))
-    (CCCE2019 Formación1 Formación2 (- Generaciones 1))
-    ))))
+    ))
 
 ;;VENTANAS
 (define ventana1 (open-viewport "*ConcaChampionsCE*" 800 700))
 (define ventana2 (open-pixmap "*ConcaChampionsCE*" 800 700))
-(define jugadores '(((340 150) (455 260) 20 1) ((300 100) (700 400) 16 2) ((700 400) (300 300) 10 3)  )) ;; LISTA DE JUGADORES
+
+(define jugadores '(((340 150) (455 260) 20 56) ((300 100) (700 400) 16 2) ((700 400) (300 300) 10 3)  )) ;; LISTA DE JUGADORES
+(define jugadores2 '(((100 10) (455 260) 20 56) ((360 100) (250 400) 16 2) ((745 426) (14 30) 10 3)  )) ;; LISTA DE JUGADORES
+(define equipos (append jugadores jugadores2))
 (define balon '((400 200) 0 45))
 
 
@@ -277,5 +274,5 @@
     ))
 
 
-(CCCE2019 '(4 4 2) '(4 4 2) 2)
+(CCCE2019 '(4 4 2) '(4 4 2) 10)
 
