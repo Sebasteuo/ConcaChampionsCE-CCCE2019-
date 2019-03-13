@@ -62,17 +62,13 @@
 ;; Funcion principal que realiza el proceso del algoritmo genético
 ;; Equipos = (Equipo1 Equipo2),  Bola = (Bolax Bolay)
 (define (Genética Equipos Bola)
-  (Genética_aux Equipos Equipos '() Bola))
-
-;; Obtiene el fitness de los equipos y los envia a seleccion
-(define (Genética_aux Equipos Fitness Bola)
+  (cond ((null? Equipos)
+         '())
+        (else (cons (Reproducir (car Equipos) Bola) (Genética (cdr Equipos) Bola))))
   )
-  
 
 
-  
 ;;**********************************************************************************************************************
-
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Conjunto de funciones para la primera generación
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -562,11 +558,13 @@
 
 ;; Reproducirá un tipo de jugador                              
 (define (Reproducir_2 Jugadores)
-  (append (Mayores_Fitness Jugadores) (parejas (car (Mayores_Fitness Jugadores)) (cadr (Mayores_Fitness Jugadores)))))
+  (cond ((equal?  (contadorDeElementos Jugadores) 2)
+         (append (list (car Jugadores)) (list (parejas (car (Mayores_Fitness Jugadores)) (cadr (Mayores_Fitness Jugadores))))))
+        (else (append (Mayores_Fitness Jugadores) (parejas (car (Mayores_Fitness Jugadores)) (cadr (Mayores_Fitness Jugadores)))))))
 
 ;; Obtiene los mayores fitness de n-1 (FUNCION BASICA)
 (define (Mayores_Fitness Jugadores)
-  (cond ((equal?  (contadorDeElementos Jugadores) 2)
+  (cond ((equal?  (contadorDeElementos Jugadores) 2) ;;Valida si solo son dos genes
          (Mayores_aux Jugadores 2 '()))
         (else (Mayores_aux Jugadores (- (contadorDeElementos Jugadores) 1) '()))))
 
