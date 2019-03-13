@@ -533,7 +533,7 @@
 
      )
  )
-
+  
 (define (parejas padre1 padre2)
   (list padre1 padre2 (Generar_Gen padre1 padre2)))
 
@@ -544,6 +544,32 @@
         (random 20 51)
         0
         (cadr(cddr(cddr Padre1)))))
+        
+
+(define (Obtener_Posicion Lista Posición)
+  (Obtener_aux Lista Posición 0)
+  )
+
+(define (Obtener_aux Lista Posicion Iterador)
+  (cond ((equal? Posicion Iterador)
+         (car Lista))
+        (else (Obtener_aux (cdr Lista) Posicion (+ Iterador 1)))))
+
+(define (Mayores_Fitness Jugadores Cantidad)
+  (Mayores_aux Jugadores Cantidad '()))
+(define (Mayores_aux Jugadores Cantidad Mayores)
+  (cond ((zero? Cantidad)
+         Mayores)
+        (else (Mayores_aux (cadr(Mayor_lista (cdr Jugadores) (car Jugadores) '()))  (- Cantidad 1) (append Mayores (car(Mayor_lista (cdr Jugadores) (car Jugadores) '())))))))
+
+(define (Mayor_lista Jugadores Mayor Resto)
+  (cond ((null? Jugadores)
+         (list Mayor Resto))
+        ((> (Obtener_Posicion (car Jugadores) 4) (Obtener_Posicion Mayor 4))
+         (Mayor_lista (cdr Jugadores) (car Jugadores) (cons Mayor Resto)))
+        (else (Mayor_lista (cdr Jugadores) Mayor (cons (car Jugadores) Resto))
+        )))
+        
         
   
   
