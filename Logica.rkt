@@ -545,7 +545,7 @@
 
 ;; Obtiene un equipo nuevo, donde ya se reproducen o se realiza el crossover, por lo que se realiza lo siguiente
 (define (Reproducir Equipo Bola)
-   (append (car (Insertar_en_fit Equipo (Fitness_por_equipo Equipo Bola) '())) ;; Quito el portero, debido a que este solo mutara, se añade su funcion de fitness
+   (append (list (car (Insertar_en_fit Equipo (Fitness_por_equipo Equipo Bola) '()))) ;; Quito el portero, debido a que este solo mutara, se añade su funcion de fitness
                              (Reproducir_Equipo (cdr (Insertar_en_fit Equipo (Fitness_por_equipo Equipo Bola) '())) '()))) ;; Envio el resto del equipo a reproducirse según su tipo, con el nuevo fitness cada uno
 
 
@@ -559,7 +559,7 @@
 ;; Reproducirá un tipo de jugador                              
 (define (Reproducir_2 Jugadores)
   (cond ((equal?  (contadorDeElementos Jugadores) 2)
-         (append (list (car Jugadores)) (list (parejas (car (Mayores_Fitness Jugadores)) (cadr (Mayores_Fitness Jugadores))))))
+         (append (list (car Jugadores)) (parejas (car (Mayores_Fitness Jugadores)) (cadr (Mayores_Fitness Jugadores)))))
         (else (append (Mayores_Fitness Jugadores) (parejas (car (Mayores_Fitness Jugadores)) (cadr (Mayores_Fitness Jugadores)))))))
 
 ;; Obtiene los mayores fitness de n-1 (FUNCION BASICA)
