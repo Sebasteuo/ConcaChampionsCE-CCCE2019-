@@ -62,7 +62,19 @@
 ;;----------------------------------------------------------------------------------------------------------------------
 ;;Funcion principal para obtener la primera generacion
 (define (Primera_Generacion Formacion1 Formacion2 Generaciones)
-  (generaEquipos (list Formacion1 Formacion2 Generaciones) '() 1))
+  (generaEquipos (list Formacion1 Formacion2) '() 1))
+;; Funcion principal que realiza el proceso del algoritmo genético
+;; Equipos = (Equipo1 Equipo2),  Bola = (Bolax Bolay)
+;; Envía a realizar el Fitness, la seleccion y la reproduccion
+(define (Algoritmo_Genético Equipos Bola)
+  (Mejorados_A_Mutar (Genética Equipos Bola) Bola))
+
+;; Envía cada equipo a mutar
+
+(define (Mejorados_A_Mutar nuevosEquipos Bola)
+  (cond ((null? nuevosEquipos)
+         '())
+        (else (cons (mutacion (car nuevosEquipos)) (Mejorados_A_Mutar (cdr nuevosEquipos) Bola)))))
 
 ;; Funcion principal que realiza el proceso del algoritmo genético
 ;; Equipos = (Equipo1 Equipo2),  Bola = (Bolax Bolay)
@@ -87,14 +99,14 @@
   )
    
 (define (genera1Aux listaFormacion listaJugadores contador)
-  (cond ((empty? listaFormacion) (append (generadorPortero '())listaJugadores))
-        ((equal? contador 1) (genera1Aux (cdr listaFormacion) (append listaJugadores (generaDefensas1 (car listaFormacion) '())) (+ contador 1)))
-        ((equal? contador 2) (genera1Aux (cdr listaFormacion) (append listaJugadores (generaMedios1 (car listaFormacion) '())) (+ contador 1)))
-        ((equal? contador 3) (genera1Aux (cdr listaFormacion) (append listaJugadores (generaDelanteros1 (car listaFormacion) '())) contador))
+  (cond ((empty? listaFormacion) (append (list (generadorPortero '()))listaJugadores))
+        ((equal? contador 1) (genera1Aux (cdr listaFormacion) (append listaJugadores  (list (generaDefensas1 (car listaFormacion) '()))) (+ contador 1)))
+        ((equal? contador 2) (genera1Aux (cdr listaFormacion) (append listaJugadores  (list (generaMedios1 (car listaFormacion) '()))) (+ contador 1)))
+        ((equal? contador 3) (genera1Aux (cdr listaFormacion) (append listaJugadores  (list (generaDelanteros1 (car listaFormacion) '()))) contador))
         )
   )
 (define (genera2Aux listaFormacion listaJugadores contador)
-  (cond ((empty? listaFormacion) (append (generadorPortero2 '())listaJugadores))
+  (cond ((empty? listaFormacion) (append (list (generadorPortero2 '()))listaJugadores))
         ((equal? contador 1) (genera2Aux (cdr listaFormacion) (append listaJugadores (list (generaDefensas2 (car listaFormacion) '()))) (+ contador 1)))
         ((equal? contador 2) (genera2Aux (cdr listaFormacion) (append listaJugadores (list (generaMedios2 (car listaFormacion) '()))) (+ contador 1)))
         ((equal? contador 3) (genera2Aux (cdr listaFormacion) (append listaJugadores (list (generaDelanteros2 (car listaFormacion) '()))) contador))
@@ -103,13 +115,13 @@
   
 ;;generador de portero grupo1
 (define (generadorPortero caracteristicas)
-(list (append caracteristicas (list (list (random 0 40) (random 180 345)) (random 0 10) (random 0 10) 1 0 (list 0 0))))
+(append caracteristicas (list (list (random 0 40) (random 180 345)) (random 0 10) (random 0 10) 1 0 (list 0 0)))
       )
 
 
 ;;generador de defensas grupo1
 (define (generaDefensas1 cantidadDefensas listaDefensas)
-  (cond ((zero? cantidadDefensas) (list listaDefensas))
+  (cond ((zero? cantidadDefensas)  listaDefensas)
         (else (generaDefensas1 (- cantidadDefensas 1) (append listaDefensas (list (list (list (random 0 274) (random 5 520)) (random 0 10) (random 0 10) (random 1 60)  0 (list 0 0) )))
 
 
@@ -461,9 +473,7 @@
 (define Equipo_Lista (list Portero Defensas Medios Delanteros))
 
 
-(cadar (Genética (list Equipo_Lista Equipo_Lista) '(120 260)))
-(cadar (Genética (Genética (list Equipo_Lista Equipo_Lista) '(120 260)) '(260 355)))
-(cadar (Genética (Genética (Genética (list Equipo_Lista Equipo_Lista) '(120 260)) '(260 355)) '(200 300)))
+
 
 
 
@@ -832,5 +842,5 @@
       )
      )
   )
-
+(define nuevosTeams (Algoritmo_Genético (list Equipo_Lista Equipo_Lista) '(120 300)))
 ;(inicioDelJuego)
